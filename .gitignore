@@ -1,0 +1,25 @@
+ 
+# Compiled python modules.
+*.pyc
+*.bmp
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+/*.egg
+.vscode
+.coverage
+.pytest_cache
+.pypirc
+./venv
+/.venv
+/.vscode
+/venv
+.idea
+.env
+/shared-files
+
+# System trash data
+.DS_Store

@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "flaskerpproject"
+version = "0.1.0"
+description = ""
+authors = ["filipp.zotov <f.zotov@datamonsters.com>"]
+
+[tool.poetry.dependencies]
+python = "3.9.*"
+gunicorn = "^20.1.0"
+watchdog = "^2.1.5"
+Flask-SQLAlchemy = "^2.5.1"
+marshmallow = "^3.13.0"
+celery = "^5.1.2"
+gevent = "^21.8.0"
+PyYAML = "^5.4.1"
+argh = "^0.26.2"
+redis = "^3.5.3"
+SQLAlchemy-Utils = "^0.37.8"
+money = "^1.3.0"
+psycopg2-binary = "^2.9.1"
+flask-marshmallow = "^0.14.0"
+marshmallow-sqlalchemy = "^0.26.1"
+Babel = "^2.9.1"
+Faker = "^8.13.2"
+Flask-Caching = "^1.10.1"
+"dogpile.cache" = "^1.1.4"
+
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

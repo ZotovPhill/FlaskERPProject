@@ -1,0 +1,23 @@
+fixtures:
+  base_dir: app.fixtures.v1
+  load:
+    Unit:
+      module: load_unit
+      class: LoadUnit
+      attributes:
+        quantity: 20
+    Category:
+      module: load_category
+      class: LoadCategory
+      attributes:
+        quantity: 20
+    Goods:
+      module: load_goods
+      class: LoadGoods
+      attributes:
+        quantity: 1000
+    # Ability:
+    #   module: load_4_ability
+    #   class: LoadAbility
+    #   attributes:
+    #     catalog: true
