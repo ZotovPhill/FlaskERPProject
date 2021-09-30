@@ -1,0 +1,88 @@
+version: "3"
+services:
+  db:
+    image: postgres:12.3-alpine
+    container_name: postgres-ferp
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST: "${POSTGRES_HOST}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - ./shared-files/database/dump:/app/dump
+      - ./shared-files/database/postgresql/data:/var/lib/postgresql/
+
+  rabbitmq:
+    image: rabbitmq:3.7.5-management
+    container_name: rabbit-mq-ferp
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS}"
+      RABBITMQ_DEFAULT_VHOST: "${RABBITMQ_DEFAULT_VHOST}"
+
+  redis:
+    image: redis:alpine
+    container_name: redis-ferp
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: backend-ferp
+    entrypoint: ./entrypoint.sh
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./shared-files/logs:/var/logs
+      - ./app:/usr/src/erp/app
+      - ./.env:/usr/src/erp/.env
+    env_file:
+      .env
+    depends_on:
+      - rabbitmq
+      - redis
+      - db
+
+  worker:
+    build: .
+    container_name: worker-ferp
+    entrypoint: ./entrypoint-celery.sh
+    volumes:
+      - ./shared-files/logs:/var/logs
+      - ./app:/usr/src/erp/app
+      - ./.env:/usr/src/erp/.env
+    env_file:
+      .env
+    depends_on:
+      - app
+      - rabbitmq
+      - redis
+
+  dashboard:
+    image: mher/flower:0.9.5
+    container_name: dashboard-ferp
+    ports:
+      - "5555:5555"
+    environment:
+      CELERY_BROKER_URL: "${CELERY_BROKER_URL}"
+      FLOWER_PURGE_OFFLINE_WORKERS: "${FLOWER_PURGE_OFFLINE_WORKERS}"
+    depends_on:
+      - rabbitmq
+      - redis
+
+  minio:
+    image: bitnami/minio:latest
+    container_name: minio-ferp
+    ports:
+      - "9090:9000"
+    environment:
+      MINIO_SERVER_HOST: "${MINIO_SERVER_HOST}"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      MINIO_DEFAULT_BUCKETS: "${MINIO_DEFAULT_BUCKETS}"

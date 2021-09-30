@@ -1,0 +1,5 @@
+#!/bin/bash
+export CONFIGURATION_SETUP="app.core.settings.DevelopmentConfig"
+export CELERY_RESULT_BACKEND="redis://redis:6379/0"
+watchmedo auto-restart --directory=./app --pattern=*.py --recursive -- celery --app=app.worker.main.celery worker -E -Q aggregation,video,file,classification,audio,audio.periodic,stream,job.info,classification.frame,classification.text,classification.meta,backoffice.cv.job.access,recognize.frame,classifier.cv.frames.result,nlp.cv.meta.result,nlp.cv.text.result --concurrency=1 --loglevel=INFO
+#watchmedo auto-restart --directory=./app --pattern=*.py --recursive -- celery multi start 10 -Q:1 aggregation,job.info,video -Q:2-6 file,video,classification.frame,classification.text,classification.meta -Q:7,8 audio,audio.periodic -Q:9,10 stream --app=app.worker.main.celery --range-prefix=worker -B --concurrency=3 --loglevel=INFO --logfile=/var/logs/celery/celery_main.log
