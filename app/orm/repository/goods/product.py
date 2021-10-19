@@ -3,4 +3,6 @@ from app.orm.models.erp.goods.product import Product
 
 
 class ProductRepository(BaseRepository):
-    __model__ = Product
+    def __init__(self):
+        super().__init__()
+        self.model = Unit

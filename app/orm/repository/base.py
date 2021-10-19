@@ -27,12 +27,12 @@ def session_scope():
 
     def run_my_program():
         with session_scope() as session:
+            unit_repository.find(1)
             ThingOne().go(session)
     """
     session = db.create_scoped_session(options={"autoflush": False, "expire_on_commit": False})
     try:
         yield session
-        session.commit()
     except:
         session.rollback()
         raise
@@ -40,42 +40,28 @@ def session_scope():
         session.close()
 
 
-class Meta(type):
-    def __new__(cls, name, bases, attrs):        
-        newattrs = {}
-        for attrname, attrvalue in attrs.items():
-            if attrname ==  '__model__':
-                newattrs[attrname.removesuffix('__').removeprefix('__')] = attrvalue
-            else:
-                newattrs[attrname] = attrvalue
 
-        return super().__new__(cls, name, bases, newattrs)
+class BaseRepository:
+    def __init__(self):
+        self.model = None
 
+    def list_paginate(self):
+        with session_scope() as session:
+            return session.query(self.model).order_by(self.model.id).options(FromCache("default")).all()
         
-
-class BaseRepository(metaclass=Meta):
-    def list_paginate(
-        self,
-        session: Session,
-        limit: int = DEFAULT_LIMIT,
-        offset: int = 0
-    ):
-        return session.query(self.model).order_by(self.model.id).options(FromCache("default")).all()
-        
-        return Pagination(
-            query,
-            page=int(math.floor(offset / limit) + 1), 
-            per_page=limit, 
-            total=query.count(), 
-            items=query.limit(limit).offset(offset)
-        )
+    def find_all(self):
+        with session_scope() as session:
+            return session.query(self.model).all()
     
-    def find_all(self, session: Session):
-        return session.query(self.model).all()
-    
-    def find(self, session: Session, id: str):
-        return session.query(self.model).get(id)
+    def find(self, id: str):
+        with session_scope() as session:
+            return session.query(self.model).get(id)
     
     def count(self, session: Session):
-        return session.query(func.count(self.model.id)).scalar()
+        with session_scope() as session:
+            return session.query(func.count(self.model.id)).scalar()
 
+    def create(self):
+        with session_scope() as session:
+            # create logic
+            session.commit()

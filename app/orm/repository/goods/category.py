@@ -3,4 +3,6 @@ from app.orm.models.erp.goods.category import Category
 
 
 class CategoryRepository(BaseRepository):
-    __model__ = Category
+    def __init__(self):
+        super().__init__()
+        self.model = Unit
